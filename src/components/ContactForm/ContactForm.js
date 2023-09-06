@@ -1,7 +1,7 @@
+import { useDispatch } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import shortid from 'shortid';
-import PropTypes from 'prop-types';
 import './ContactForm.scss';
 
 const validationSchema = Yup.object().shape({
@@ -21,14 +21,16 @@ const initialValues = {
   number: '',
 };
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+
   const handleSubmit = (values, { resetForm }) => {
+    const { name, number } = values;
     const newContact = {
-      id: shortid.generate(),
-      name: values.name,
-      number: values.number,
+      name: name,
+      number: number,
     };
-    onAddContact(newContact);
+    dispatch(addContact(newContact));
     resetForm();
   };
 
@@ -73,8 +75,11 @@ const ContactForm = ({ onAddContact }) => {
   );
 };
 
-ContactForm.propTypes = {
-  onAddContact: PropTypes.func.isRequired,
-};
-
 export default ContactForm;
+
+// ContactForm.propTypes = {
+//   initialValues: PropTypes.shape({
+//     name: PropTypes.string.isRequired,
+//     number: PropTypes.string.isRequired,
+//   }),
+// };

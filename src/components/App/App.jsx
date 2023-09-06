@@ -1,46 +1,27 @@
-import { useState } from 'react';
-
+import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
+import { addContact, deleteContact } from '../../redux/contactsSlice';
+import { setFilter } from '../../redux/filterSlice';
 import ContactForm from '../ContactForm';
 import ContactsList from '../ContactsList';
 import Filter from '../Filter';
-
 import './App.scss';
-import { useEffect } from 'react';
 
 export default function App() {
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(localStorage.getItem('contacts')) ?? [];
-  });
-  const [filter, setFilter] = useState('');
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.list);
+  const filter = useSelector(state => state.filter);
 
-  //write to LS
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addContact = newContact => {
-    const { name } = newContact;
-
-    if (
-      contacts.some(
-        contact => contact.name.toLowerCase() === name.toLowerCase()
-      )
-    ) {
-      alert(`${name} is already in contacts`);
-      return;
-    }
-
-    setContacts(prevContacts => [...prevContacts, newContact]);
+  const addContactHandler = newContact => {
+    dispatch(addContact(newContact));
   };
 
-  const deleteContact = contactId => {
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== contactId)
-    );
+  const deleteContactHandler = contactId => {
+    dispatch(deleteContact(contactId));
   };
 
-  const changeFilter = e => {
-    setFilter(e.currentTarget.value);
+  const changeFilterHandler = e => {
+    dispatch(setFilter(e.currentTarget.value));
   };
 
   const normalizedFilter = filter.toLowerCase();
@@ -51,14 +32,14 @@ export default function App() {
   return (
     <div className="App__container">
       <h1>Phonebook</h1>
-      <ContactForm onAddContact={addContact} />
+      <ContactForm onAddContact={addContactHandler} />
 
       <h2>Contacts</h2>
-      <Filter value={filter} onChange={changeFilter} />
+      <Filter value={filter} onChange={changeFilterHandler} />
       {contacts.length > 0 ? (
         <ContactsList
           contacts={filteredContacts}
-          onDeleteContact={deleteContact}
+          onDeleteContact={deleteContactHandler}
         />
       ) : (
         <p>No contacts available.</p>
@@ -66,3 +47,17 @@ export default function App() {
     </div>
   );
 }
+
+App.propTypes = {
+  contacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      number: PropTypes.string,
+    })
+  ),
+  filter: PropTypes.string,
+  addContactHandler: PropTypes.func,
+  deleteContactHandler: PropTypes.func,
+  changeFilterHandler: PropTypes.func,
+};

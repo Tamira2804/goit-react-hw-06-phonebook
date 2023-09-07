@@ -11,7 +11,6 @@ const Filter = () => {
   const changeFilterHandler = e => {
     dispatch(setFilter(e.currentTarget.value));
   };
-  console.log('Current filter value:', filter);
 
   return (
     <div className="Filter__container">

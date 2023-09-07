@@ -16,19 +16,20 @@ const contactsSlice = createSlice({
       reducer(state, action) {
         state.list.push(action.payload);
       },
-      prepare(text, number) {
+      prepare(contact) {
         return {
           payload: {
+            ...contact,
             id: nanoid(),
-            name: text,
-            number: number,
           },
         };
       },
     },
     deleteContact(state, action) {
-      const index = state.findIndex(contact => contact.id === action.payload);
-      state.splice(index, 1);
+      const index = state.list.findIndex(
+        contact => contact.id === action.payload
+      );
+      state.list.splice(index, 1);
     },
   },
 });

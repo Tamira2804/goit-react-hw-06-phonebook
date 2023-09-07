@@ -1,36 +1,41 @@
 import React from 'react';
-
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteContact } from '../../redux/contactsSlice';
+import { getFilteredContacts } from '../../redux/selectors';
 import './ContactsList.scss';
 
-const ContactsList = ({ contacts, onDeleteContact }) => {
-  return (
-    <ul className="ContactList">
-      {contacts.map(({ id, name, number }) => (
-        <li key={id} className="ContactList__item">
-          {name}: {number}
-          <button
-            type="button"
-            className="ContactList__btn"
-            onClick={() => onDeleteContact(id)}
-          >
-            Delete
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-};
+const ContactsList = () => {
+  const contactsSelector = state => getFilteredContacts(state);
+  const contacts = useSelector(contactsSelector);
 
-ContactsList.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  onDeleteContact: PropTypes.func.isRequired,
+  const dispatch = useDispatch();
+
+  const deleteContactHandler = contactId => {
+    dispatch(deleteContact(contactId));
+  };
+
+  return (
+    <div>
+      {contacts && contacts.length > 0 ? (
+        <ul className="ContactList">
+          {contacts.map(({ id, name, number }) => (
+            <li key={id} className="ContactList__item">
+              {name}: {number}
+              <button
+                type="button"
+                className="ContactList__btn"
+                onClick={() => deleteContactHandler(id)}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No saved contacts.</p>
+      )}
+    </div>
+  );
 };
 
 export default ContactsList;

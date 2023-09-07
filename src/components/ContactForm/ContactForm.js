@@ -1,8 +1,9 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from '../../redux/contactsSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './ContactForm.scss';
+import { isContactExists } from 'redux/selectors';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -23,14 +24,21 @@ const initialValues = {
 
 const ContactForm = () => {
   const dispatch = useDispatch();
+  const isContactDuplicate = useSelector(isContactExists);
 
   const handleSubmit = (values, { resetForm }) => {
     const { name, number } = values;
-    const newContact = {
-      name: name,
-      number: number,
-    };
-    dispatch(addContact(newContact));
+
+    if (isContactDuplicate(name)) {
+      alert(`${name} is already in contacts`);
+    } else {
+      const newContact = {
+        name: name,
+        number: number,
+      };
+
+      dispatch(addContact(newContact));
+    }
     resetForm();
   };
 
@@ -76,10 +84,3 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
-
-// ContactForm.propTypes = {
-//   initialValues: PropTypes.shape({
-//     name: PropTypes.string.isRequired,
-//     number: PropTypes.string.isRequired,
-//   }),
-// };

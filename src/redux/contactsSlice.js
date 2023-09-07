@@ -36,4 +36,8 @@ const contactsSlice = createSlice({
 
 export const { addContact, deleteContact } = contactsSlice.actions;
 
-export default persistReducer(persistConfig, contactsSlice.reducer);
+// export default persistReducer(persistConfig, contactsSlice.reducer);
+export const persistedContactsReducer = persistReducer(
+  persistConfig,
+  contactsSlice.reducer
+);

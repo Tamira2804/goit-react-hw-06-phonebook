@@ -3,7 +3,7 @@ import { addContact } from '../../redux/contactsSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './ContactForm.scss';
-import { isContactExists } from 'redux/selectors';
+import { getContactsList } from '../../redux/selectors';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -24,12 +24,18 @@ const initialValues = {
 
 const ContactForm = () => {
   const dispatch = useDispatch();
-  const isContactDuplicate = useSelector(isContactExists);
+  const contactsList = useSelector(getContactsList);
 
   const handleSubmit = (values, { resetForm }) => {
     const { name, number } = values;
 
-    if (isContactDuplicate(name)) {
+    const isContactDuplicate = () => {
+      return contactsList.some(
+        contact => contact.name.toLowerCase() === name.toLowerCase()
+      );
+    };
+
+    if (isContactDuplicate()) {
       alert(`${name} is already in contacts`);
     } else {
       const newContact = {
